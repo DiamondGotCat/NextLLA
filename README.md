@@ -9,6 +9,11 @@ Please read the following before use:
 - This technology is still under development and I take no responsibility for any damage that may occur. Use at your own risk.
 - NextLLA can execute shell commands and in some environments can use root privileges (also known as superuser).
 
+## Dependencies
+- `requests` (PyPI)
+- `rich` (PyPI)
+- `openai` (PyPI)
+
 ## How
 GPT alone cannot execute code.
 
