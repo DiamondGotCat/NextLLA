@@ -171,7 +171,7 @@ def getResponse(chat_history, model_id, available_commands):
             "role": "system",
             "content": f"""
 You are an excellent assistant.
-Your name is "NextNLP".
+Your name is "NextLLA".
 You can use AgentCode to access various functionalities.
 
 # About AgentCode
