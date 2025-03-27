@@ -56,7 +56,7 @@ def runPython(script, resultVar):
 
 def runShellCommand(command):
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
-    return result.stdout
+    return f"stdout: \n{result.stdout}\n\nstderr: \n{result.stderr}"
 
 def searchSearXNG(keyword):
     response = requests.get(f"http://localhost:8080/search?q={keyword}&format=json")
@@ -232,8 +232,8 @@ Below is a list of available AgentCode commands:
                 action_func = available_commands_by_id[cmd_id]["action"]
                 try:
                     result = action_func(**command["args"])
-                    chatHistory.append({"role": "system", "content": f"EXECUTED '{cmd_id}'. \nResult: '''{result}'''"})
-                    logger.info(f"[bold blue]EXECUTED[/bold blue] {cmd_id}\nArgs: {command['args']}\nResult: '''{result}'''")
+                    chatHistory.append({"role": "system", "content": f"EXECUTED '{cmd_id}'. \nResult: '''{repr(result)}'''"})
+                    logger.info(f"[bold blue]EXECUTED[/bold blue] {cmd_id}\nArgs: {command['args']}\nResult: '''{repr(result)}'''")
 
                 except Exception as e:
                     chatHistory.append({"role": "system", "content": f"EXECUTED '{cmd_id}'\nError: '''{e}'''"})
