@@ -105,7 +105,7 @@ def completeTask(id):
         return f"Error: Task '{id}' not found."
 
 def clearTasks():
-    taskList = {}
+    taskList.clear()
     return "Done!"
 
 # ---------- Parser ---------- #
