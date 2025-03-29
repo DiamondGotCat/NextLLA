@@ -1,9 +1,12 @@
+import uuid
+import argparse
 import json
 import subprocess
 import requests
 import logging
 import rich
 from rich import print
+from rich.prompt import Prompt
 from rich.markup import escape
 from rich.logging import RichHandler
 from openai import OpenAI
@@ -12,8 +15,12 @@ from openai import OpenAI
 
 client = OpenAI()
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--debug", action="store_true")
+args = parser.parse_args()
+
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=(logging.DEBUG if args.debug else logging.INFO),
     format="%(message)s",
     datefmt="[%X]",
     handlers=[RichHandler(markup=True)]
@@ -26,6 +33,7 @@ logger = logging.getLogger("rich")
 localVars = {}
 taskList = {}
 chatHistory = []
+current_session_id = uuid.uuid4()
 
 # ---------- Simple Functions ---------- #
 
@@ -65,6 +73,10 @@ def searchSearXNG(keyword):
 def visitWeb(url):
     response = requests.get(url)
     return response.content
+
+def endChat():
+    print("[green]Chat session ended. Goodbye![/green]")
+    raise SystemExit()
 
 # ---------- TaskList Commands ---------- #
 
@@ -165,7 +177,9 @@ def parse_agent_code(response):
 
 # ---------- Main Functions ---------- #
 
-def getResponse(chat_history, model_id, available_commands):
+def getResponseWithAgentCode(chat_history, model_id, available_commands):
+    global current_session_id
+
     chat_history_local = [
         {
             "role": "system",
@@ -214,12 +228,21 @@ Below is a list of available AgentCode commands:
 ```
 {convertCommandsToText(available_commands)}
 ```
+
+Current Session ID: {current_session_id}
 """
         }
     ] + chat_history
 
     responseFromGPT = getOneResponse(chat_history_local, model_id)
     chatHistory.append({"role": "assistant", "content": responseFromGPT})
+
+    return responseFromGPT
+
+def sub(chat_history, model_id, available_commands):
+    global current_session_id
+
+    responseFromGPT = getResponseWithAgentCode(chat_history, model_id, available_commands)
 
     commands = parse_agent_code(responseFromGPT)
     available_commands_by_id = {cmd["id"]: cmd for cmd in available_commands}
@@ -231,24 +254,38 @@ Below is a list of available AgentCode commands:
             if cmd_id in available_commands_by_id:
                 action_func = available_commands_by_id[cmd_id]["action"]
                 try:
-                    result = action_func(**command["args"])
-                    chatHistory.append({"role": "system", "content": f"EXECUTED '{cmd_id}'. \nResult: '''{repr(result)}'''"})
-                    logger.info(f"[bold blue]EXECUTED[/bold blue] {cmd_id}\nArgs: {command['args']}\nResult: '''{repr(result)}'''")
+
+                    print("\n[bold yellow]🛠️ AgentCode Execution Request[/bold yellow]")
+                    print(f"Session ID: [cyan]{current_session_id}[/cyan]")
+                    print(f"Command ID: [blue bold]{cmd_id}[/blue bold]")
+                    print("\n[bold]📘 Description:[/bold]")
+                    print(f"[dim]{available_commands_by_id[cmd_id]['desc'].strip()}[/dim]")
+                    print("\n[bold]📦 Arguments:[/bold]")
+                    print(f"[white]{escape(json.dumps(command['args'], indent=2, ensure_ascii=False))}[/white]")
+
+
+                    userConfirm = Prompt.ask("Are you OK", default="y", choices=["y", "n"])
+                    if userConfirm == "y":
+                        result = action_func(**command["args"])
+                        chatHistory.append({"role": "system", "content": f"AgentCode Session ID {current_session_id} EXECUTED '{cmd_id}'. \nResult: '''{repr(result)}'''"})
+                        logger.info(f"[bold blue]AgentCode Session ID {current_session_id} has EXECUTED[/bold blue] {cmd_id}\nArgs: {command['args']}\nResult: '''{repr(result)}'''")
+                    else:
+                        raise RuntimeError("Sorry, the user refused to run.")
 
                 except Exception as e:
-                    chatHistory.append({"role": "system", "content": f"EXECUTED '{cmd_id}'\nError: '''{e}'''"})
+                    chatHistory.append({"role": "system", "content": f"AgentCode Session ID {current_session_id} EXECUTED '{cmd_id}'\nError: '''{e}'''"})
                     escaped_args = escape(str(command['args']))
                     escaped_error = escape(str(e))
-                    logger.info(f"[bold red]EXECUTED[/bold red] {cmd_id}\nArgs: {escaped_args}\nError: '''{escaped_error}'''")
+                    logger.info(f"[bold red]AgentCode Session ID {current_session_id} has EXECUTED[/bold red] {cmd_id}\nArgs: {escaped_args}\nError: '''{escaped_error}'''")
             else:
                 chatHistory.append({"role": "system", "content": f"UNKNOWN COMMAND: '{cmd_id}'"})
         
-        getResponse(chatHistory, model_id, available_commands)
+        sub(chatHistory, model_id, available_commands)
     
     else:
         print(responseFromGPT)
 
-    return responseFromGPT
+    current_session_id = uuid.uuid4()
 
 # ---------- Main Variables ---------- #
 
@@ -394,7 +431,7 @@ Output:
         "desc": """
 End this Chat.
 """,
-        "action": exit
+        "action": endChat
     }
 ]
 
@@ -404,4 +441,4 @@ if __name__ == "__main__":
     while True:
         prompt = input(">>> ")
         chatHistory.append({"role": "user", "content": prompt})
-        response = getResponse(chatHistory, "gpt-4o-mini", availableCommands)
+        sub(chatHistory, "gpt-4o-mini", availableCommands)
