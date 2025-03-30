@@ -49,10 +49,8 @@ You can issue an API key after signing up on https://platform.openai.com/.
 NextLLA will stop working if you exceed the free space available in your API key.
 
 ## Cledit
-- GPT Model Access with OpenAI Official API (using [Official Python Library](https://github.com/openai/openai-python)), by [OpenAI]
-(https://openai.com)
-- Ollama Model Access with Ollama Official API (using [Official Python Library](https://github.com/ollama/ollama-python)), by [Ollama]
-(https://ollama.com)
+- GPT Model Access with OpenAI Official API (using [Official Python Library](https://github.com/openai/openai-python)), by [OpenAI](https://openai.com)
+- Ollama Model Access with Ollama Official API (using [Official Python Library](https://github.com/ollama/ollama-python)), by [Ollama](https://ollama.com)
 - The concept of "agent", by AI/ML Researcher
 - [AgentCode](https://github.com/DiamondGotCat/AgentGPT) by [DiamondGotCat](https://github.com/DiamondGotCat)
 - Support by Everyone
