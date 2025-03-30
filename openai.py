@@ -438,7 +438,8 @@ End this Chat.
 # ---------- Main ---------- #
 
 if __name__ == "__main__":
+    model_id = Prompt.ask("OpenAI Model ID", default="gpt-4o-mini")
     while True:
         prompt = input(">>> ")
         chatHistory.append({"role": "user", "content": prompt})
-        sub(chatHistory, Prompt.ask("OpenAI Model ID", default="gpt-4o-mini"), availableCommands)
+        sub(chatHistory, model_id, availableCommands)
