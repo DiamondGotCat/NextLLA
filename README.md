@@ -12,7 +12,12 @@ Please read the following before use:
 ## Dependencies
 - `requests` (PyPI)
 - `rich` (PyPI)
-- `openai` (PyPI)
+- `openai` or `ollama` (PyPI)
+
+## Safety
+Given the structure in which LLM operates computers, we cannot guarantee its safety.
+However, in a recent commit, a system has been added that asks for permission from the user when LLM attempts to perform an operation.
+We believe this makes it even safer to use, but please continue to use it at your own risk.
 
 ## How
 GPT alone cannot execute code.
@@ -34,7 +39,7 @@ By default, SearXNG is supported as a search function.
 
 If you want to disable AgentCode functions such as searching with SearXNG, change the content of the "availableCommands" variable at the end of the script.
 
-## About API Key
+## About OpenAI API Key
 NextLLA uses the OpenAI API to call GPT.
 
 Please set your API key to the "OPENAI_API_KEY" item in your shell environment variables.
