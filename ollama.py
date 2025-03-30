@@ -435,7 +435,8 @@ End this Chat.
 # ---------- Main ---------- #
 
 if __name__ == "__main__":
+    model_id = Prompt.ask("Ollama Model ID", default="llama3.1:8b")
     while True:
         prompt = input(">>> ")
         chatHistory.append({"role": "user", "content": prompt})
-        sub(chatHistory, Prompt.ask("Ollama Model ID", default="llama3.1:8b"), availableCommands)
+        sub(chatHistory, model_id, availableCommands)
