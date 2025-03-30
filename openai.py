@@ -441,4 +441,4 @@ if __name__ == "__main__":
     while True:
         prompt = input(">>> ")
         chatHistory.append({"role": "user", "content": prompt})
-        sub(chatHistory, "gpt-4o-mini", availableCommands)
+        sub(chatHistory, Prompt.ask("OpenAI Model ID", default="gpt-4o-mini"), availableCommands)
