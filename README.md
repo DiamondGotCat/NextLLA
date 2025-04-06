@@ -1,6 +1,9 @@
 # NextLLA
 (Next Large Language Agent) A cutting-edge AI agent built for gpt-4o-mini
 
+## NEW: NextLLAKit has Released!
+[Here!](https://github.com/DiamondGotCat/NextLLAKit)
+
 ## Warning
 Please read the following before use:
 - NextLLA is based on the concept of "Agent", where LLM controls a computer by itself.
